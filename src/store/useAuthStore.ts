@@ -11,7 +11,7 @@ export interface IAuthUser {
   email: string;
   fullname: string;
   profilePic: string;
-  id: string;
+  _id: string;
   createdAt: string;
 }
 
@@ -46,7 +46,7 @@ export interface IUseAuthStore {
 export const defaultAuthUser = {
   email: "",
   fullname: "",
-  id: "",
+  _id: "",
   profilePic: "",
 };
 
@@ -60,7 +60,7 @@ export const useAuthStore = create<IUseAuthStore>((set) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-      set({ authUser: res.data.data.data });
+      set({ authUser: res.data.data });
     } catch (error) {
       console.log("Error in checkAuth:", error);
       set({ authUser: null });
@@ -73,7 +73,7 @@ export const useAuthStore = create<IUseAuthStore>((set) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data.data.data as IAuthUser });
+      set({ authUser: res.data.data as IAuthUser });
       toast.success("Account created successfully");
     } catch (error: any) {
       toast.error(error.response.data.message);
@@ -86,7 +86,7 @@ export const useAuthStore = create<IUseAuthStore>((set) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      set({ authUser: res.data.data.data as IAuthUser });
+      set({ authUser: res.data.data as IAuthUser });
       toast.success("Logged in successfully");
     } catch (error: any) {
       toast.error(error.response.data.message);
@@ -109,7 +109,7 @@ export const useAuthStore = create<IUseAuthStore>((set) => ({
     set({ isUpdatingProfile: true });
     try {
       const res = await axiosInstance.put("/auth/update-profile", data);
-      set({ authUser: res.data.data.data });
+      set({ authUser: res.data.data });
       toast.success("Profile updated successfully");
     } catch (error: any) {
       console.log("error in update profile:", error);

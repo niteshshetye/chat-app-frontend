@@ -42,7 +42,7 @@ export interface IUserChatStore {
   getUsers: () => Promise<void>;
   getMessages: (userId: TGetMessagePayload) => Promise<void>;
   sendMessage: (messageData: ISendMessagePayload) => Promise<void>;
-  setSelectedUser: (selectedUser: IUser) => void;
+  setSelectedUser: (selectedUser: IUser | null) => void;
 }
 
 export const useChatStore = create<IUserChatStore>((set, get) => ({
@@ -56,7 +56,7 @@ export const useChatStore = create<IUserChatStore>((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/message/users");
-      set({ users: res.data.data.data as IUser[] });
+      set({ users: res.data.data as IUser[] });
     } catch (error: any) {
       toast.error(error.response.data.message);
     } finally {
@@ -68,13 +68,14 @@ export const useChatStore = create<IUserChatStore>((set, get) => ({
     set({ isMessagesLoading: true });
     try {
       const res = await axiosInstance.get(`/message/users/${userId}`);
-      set({ messages: res.data.data.data as IMessage[] });
+      set({ messages: res.data.data as IMessage[] });
     } catch (error: any) {
       toast.error(error.response.data.message);
     } finally {
       set({ isMessagesLoading: false });
     }
   },
+
   sendMessage: async (messageData: ISendMessagePayload) => {
     const { selectedUser, messages } = get();
 
@@ -83,13 +84,13 @@ export const useChatStore = create<IUserChatStore>((set, get) => ({
         `/message/send/${selectedUser?._id}`,
         messageData
       );
-      set({ messages: [...messages, res.data.data.data as IMessage] });
+      set({ messages: [...messages, res.data.data as IMessage] });
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
   },
 
-  setSelectedUser: (selectedUser: IUser) => set({ selectedUser }),
+  setSelectedUser: (selectedUser: IUser | null) => set({ selectedUser }),
 
   // subscribeToMessages: () => {
   //   const { selectedUser } = get();

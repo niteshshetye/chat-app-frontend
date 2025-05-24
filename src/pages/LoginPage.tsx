@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Eye, EyeOff, Lock, Mail, MessageSquare } from "lucide-react";
 
 import AuthImagePattern from "../components/AuthImagePattern";
@@ -8,12 +9,13 @@ import AuthImagePattern from "../components/AuthImagePattern";
 import { useAuthStore } from "../store/useAuthStore";
 
 const LoginPage = () => {
-  const { login } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const { login, authUser } = useAuthStore();
+  const navigate = useNavigate();
 
   const validateForm = () => {
     if (!formData.email.trim()) return toast.error("Email is required");
@@ -31,7 +33,8 @@ const LoginPage = () => {
     const success = validateForm();
 
     if (success) {
-      login(formData);
+      await login(formData);
+      navigate("/");
     }
   };
 
