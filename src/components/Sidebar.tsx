@@ -6,15 +6,14 @@ import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import defaultProfilePic from "../assets/defaultAvatar.png";
 
 import { useChatStore } from "../store/useChatStore";
-// import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Sidebar = () => {
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } =
     useChatStore();
-  // const { onlineUsers } = useAuthStore();
-  const onlineUsers: string[] = [];
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getUsers();
@@ -51,7 +50,7 @@ const Sidebar = () => {
       </div>
 
       <div className="overflow-y-auto w-full py-3">
-        {filteredUsers.map((user) => (
+        {users.map((user) => (
           <button
             key={user._id}
             onClick={() => setSelectedUser(user)}

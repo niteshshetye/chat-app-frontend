@@ -2,9 +2,9 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 
-import { axiosInstance } from "../lib/axios";
+import { useAuthStore } from "./useAuthStore";
 
-// import { useAuthStore } from "./useAuthStore";
+import { axiosInstance } from "../lib/axios";
 
 export type TGetMessagePayload = string;
 
@@ -43,6 +43,8 @@ export interface IUserChatStore {
   getMessages: (userId: TGetMessagePayload) => Promise<void>;
   sendMessage: (messageData: ISendMessagePayload) => Promise<void>;
   setSelectedUser: (selectedUser: IUser | null) => void;
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
 }
 
 export const useChatStore = create<IUserChatStore>((set, get) => ({
@@ -92,25 +94,27 @@ export const useChatStore = create<IUserChatStore>((set, get) => ({
 
   setSelectedUser: (selectedUser: IUser | null) => set({ selectedUser }),
 
-  // subscribeToMessages: () => {
-  //   const { selectedUser } = get();
-  //   if (!selectedUser) return;
+  subscribeToMessages: () => {
+    const { selectedUser } = get();
+    if (!selectedUser) return;
 
-  //   const socket = useAuthStore.getState().socket;
+    const socket = useAuthStore.getState().socket;
 
-  //   socket.on("newMessage", (newMessage) => {
-  //     const isMessageSentFromSelectedUser =
-  //       newMessage.senderId === selectedUser._id;
-  //     if (!isMessageSentFromSelectedUser) return;
+    if (!socket) return;
 
-  //     set({
-  //       messages: [...get().messages, newMessage],
-  //     });
-  //   });
-  // },
+    socket.on("newMessage", (newMessage) => {
+      const isMessageSentFromSelectedUser =
+        newMessage.senderId === selectedUser._id;
+      if (!isMessageSentFromSelectedUser) return;
 
-  // unsubscribeFromMessages: () => {
-  //   const socket = useAuthStore.getState().socket;
-  //   socket.off("newMessage");
-  // },
+      set({
+        messages: [...get().messages, newMessage],
+      });
+    });
+  },
+
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket?.off("newMessage");
+  },
 }));
